@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>汉语方言音变地理分布 · 四题</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#080b14;--panel:rgba(255,255,255,.04);--line:rgba(255,255,255,.09);--txt:#e6ecf5;--dim:#8b98ad}
+  body{background:radial-gradient(900px 600px at 15% 0%,rgba(34,211,238,.10),transparent 60%),
+       radial-gradient(900px 600px at 85% 100%,rgba(245,158,11,.10),transparent 60%),var(--bg);
+       color:var(--txt);font-family:"PingFang SC","Microsoft YaHei","Segoe UI",system-ui,sans-serif;
+       min-height:100vh;padding:26px 22px 50px}
+  header{max-width:1560px;margin:0 auto 20px}
+  h1{font-size:26px;font-weight:700;letter-spacing:.5px;
+     background:linear-gradient(90deg,#22d3ee,#a5f3fc 40%,#fcd34d 70%,#f59e0b);
+     -webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--dim);font-size:13px;margin-top:6px;line-height:1.7}
+  .sub a{color:#67e8f9;text-decoration:none}
+  .sub a:hover{text-decoration:underline}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;max-width:1560px;margin:16px auto 0}
+  .tabs button{background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--dim);
+    font-size:13px;padding:8px 16px;border-radius:10px;cursor:pointer;font-family:inherit;transition:.15s}
+  .tabs button:hover{color:#fff;border-color:rgba(255,255,255,.25)}
+  .tabs button.on{background:linear-gradient(135deg,rgba(34,211,238,.28),rgba(245,158,11,.28));
+    color:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.12) inset}
+  .page{display:none}.page.on{display:block}
+  .intro{max-width:1560px;margin:0 auto 16px;background:var(--panel);border:1px solid var(--line);
+    border-radius:14px;padding:12px 16px;font-size:12.5px;line-height:1.85;color:#b6c2d3}
+  .intro b{color:#e2e8f0}.intro .k{color:#67e8f9}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;
+    max-width:1560px;margin:0 auto 18px}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px 16px;backdrop-filter:blur(6px)}
+  .stat b{display:block;font-size:21px;font-variant-numeric:tabular-nums;
+    background:linear-gradient(90deg,#a5f3fc,#fcd34d);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .stat span{font-size:12px;color:var(--dim)}
+  .layout{display:grid;grid-template-columns:minmax(0,1fr) 358px;gap:18px;max-width:1560px;margin:0 auto}
+  @media(max-width:1120px){.layout{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;backdrop-filter:blur(6px)}
+  .card h2{font-size:14px;font-weight:600;color:#cbd5e1;margin-bottom:12px;letter-spacing:.5px;
+    display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .card h2 em{font-style:normal;font-size:11.5px;color:var(--dim);font-weight:400}
+  .side{display:flex;flex-direction:column;gap:18px}.grow{flex:1;min-height:0}
+  .views{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
+  .views button{background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--dim);
+    font-size:12.5px;padding:6px 13px;border-radius:9px;cursor:pointer;font-family:inherit;transition:.15s}
+  .views button:hover{color:#fff;border-color:rgba(255,255,255,.25)}
+  .views button.on{background:linear-gradient(135deg,rgba(34,211,238,.28),rgba(245,158,11,.28));
+    color:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.12) inset}
+  .mapWrap{position:relative;width:100%;aspect-ratio:1000/732;min-height:340px;border-radius:14px;
+    overflow:hidden;cursor:grab;background:radial-gradient(700px 500px at 50% 45%,rgba(255,255,255,.025),transparent 70%)}
+  .mapWrap:active{cursor:grabbing}.map{width:100%;height:100%;display:block}
+  .land{fill:rgba(255,255,255,.035);stroke:rgba(150,180,220,.42);stroke-width:1;
+    stroke-linejoin:round;vector-effect:non-scaling-stroke;transition:fill .15s}
+  .land:hover{fill:rgba(120,190,255,.11)}
+  .river{fill:none;stroke:rgba(80,170,230,.25);stroke-width:1;vector-effect:non-scaling-stroke;
+    stroke-linecap:round;stroke-linejoin:round}
+  .gridline{stroke:rgba(255,255,255,.045);stroke-width:1;vector-effect:non-scaling-stroke}
+  .plabel{fill:rgba(200,215,235,.42);text-anchor:middle;dominant-baseline:middle;
+    pointer-events:none;letter-spacing:1px;font-weight:500}
+  .mlabel{pointer-events:none;font-weight:500;letter-spacing:.4px}
+  .zonelabel{pointer-events:none;text-anchor:middle;dominant-baseline:middle;letter-spacing:.5px}
+  .bub{cursor:pointer;transition:opacity .18s}
+  .bub circle.body{stroke-width:1.15;vector-effect:non-scaling-stroke;transition:stroke-width .13s,fill-opacity .13s}
+  .bub circle.hit{fill:transparent;stroke:none}
+  .bub:hover circle.body{stroke-width:2.6;fill-opacity:.85}
+  .bub.dim{opacity:.08;pointer-events:none}
+  .tip{position:absolute;left:0;top:0;pointer-events:none;opacity:0;transition:opacity .12s;
+    background:rgba(10,15,26,.97);border:1px solid rgba(255,255,255,.17);border-radius:10px;
+    padding:9px 12px;font-size:12.5px;line-height:1.7;white-space:nowrap;z-index:9;
+    box-shadow:0 14px 38px rgba(0,0,0,.65)}
+  .tip .t{font-weight:600;font-size:13.5px;margin-bottom:4px;color:#fff}
+  .tip .k{color:var(--dim);margin-right:6px}
+  .tip .v{font-variant-numeric:tabular-nums;color:#e2e8f0}
+  .tip .vv{font-family:"Charis SIL","Doulos SIL","Times New Roman",serif;font-size:15px;font-weight:600}
+  .tip .badge{display:inline-block;font-size:10px;padding:1px 6px;border-radius:6px;margin-left:6px;
+    border:1px solid currentColor;opacity:.9}
+  .legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
+  .lg{display:flex;align-items:center;gap:7px;font-size:12px;background:rgba(255,255,255,.04);
+    border:1px solid var(--line);border-radius:9px;padding:6px 10px;cursor:pointer;user-select:none;transition:.15s}
+  .lg:hover{background:rgba(255,255,255,.09)}.lg.off{opacity:.32}
+  .lg i{width:10px;height:10px;border-radius:50%;flex:none}
+  .lg .nm{color:#dbe4ef;font-weight:500}
+  .lg .vv{font-family:"Charis SIL","Doulos SIL","Times New Roman",serif;color:var(--dim);font-size:12.5px}
+  .lg .ct{margin-left:auto;color:var(--dim);font-variant-numeric:tabular-nums;font-size:11px}
+  input[type=search]{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--line);
+    border-radius:10px;padding:9px 12px;color:var(--txt);font-family:inherit;font-size:12.5px;outline:none}
+  input[type=search]:focus{border-color:rgba(34,211,238,.5)}
+  .rank{list-style:none;display:flex;flex-direction:column;gap:6px;max-height:352px;overflow:auto;padding-right:4px}
+  .rank::-webkit-scrollbar{width:5px}
+  .rank::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:3px}
+  .rank li{position:relative;font-size:12.5px;padding:6px 9px;border-radius:8px;overflow:hidden;
+    background:rgba(255,255,255,.03);display:flex;justify-content:space-between;gap:8px;
+    cursor:pointer;transition:.15s;align-items:baseline}
+  .rank li:hover{background:rgba(255,255,255,.085)}.rank li.sel{outline:1px solid rgba(255,255,255,.5)}
+  .rank li .bar{position:absolute;left:0;top:0;bottom:0;border-radius:8px;opacity:.17;z-index:0}
+  .rank li span{position:relative;z-index:1}
+  .rank li .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#dbe4ef}
+  .rank li .nm b{font-family:"Charis SIL","Doulos SIL","Times New Roman",serif;font-size:13.5px}
+  .rank li .nm em{font-style:normal;color:var(--dim);font-size:11px;margin-left:5px}
+  .rank li .nu{font-variant-numeric:tabular-nums;color:#cbd5e1;flex:none;font-size:11.5px}
+  .noplace{list-style:none;display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--dim)}
+  .noplace li{padding:5px 9px;background:rgba(255,255,255,.03);border-radius:7px;line-height:1.65;transition:.15s}
+  .noplace li.click{cursor:pointer}.noplace li.click:hover{background:rgba(255,255,255,.085)}
+  .noplace li b{color:#cbd5e1;font-weight:500}
+  .foot{max-width:1560px;margin:18px auto 0;font-size:11.5px;color:#5f6b7a;line-height:1.8}
+  .loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    color:#67e8f9;font-size:13px;letter-spacing:1px;background:rgba(8,11,20,.6);
+    backdrop-filter:blur(2px);z-index:5;border-radius:14px;transition:opacity .4s}
+</style>
+</head>
+<body>
+<header>
+  <h1>汉语方言音变地理分布 · 四题</h1>
+  <div class="sub">
+    数据来源：知乎 · 山歌与村笛（
+    <a href="https://www.zhihu.com/question/339636388/answer/2898735906" target="_blank" rel="noopener">① “给（～你）”音变</a>｜
+    <a href="https://www.zhihu.com/question/593679487/answer/2981119686" target="_blank" rel="noopener">③ 河北疑影喻母读 ni-</a>｜
+    <a href="https://www.zhihu.com/question/591554834/answer/3066921205" target="_blank" rel="noopener">④ 知澄母三等白读 t</a>
+    ）｜补充：Ann、阿十一、Leo、unt
+  </div>
+  <nav class="tabs" id="tabs"></nav>
+</header>
+<main id="pages"></main>
+<div class="foot">
+  说明：①府/州按清代辖县逐一落点；区域泛称按该区域地级市/县市逐一落点（未明确排除者默认属该读音）。
+  ②02、03 底图分别为山东省、河北省地级市界。③带虚线描边的点为原文附有补充说明。
+</div>
+
+<script>
+/* ========== 0. 通用 ========== */
+const NS='http://www.w3.org/2000/svg';
+const el=(t,a={})=>{const n=document.createElementNS(NS,t);for(const k in a)n.setAttribute(k,a[k]);return n;};
+const RAD=Math.PI/180, LON_W=73, LON_E=136, LAT_N=54;
+const MERC=lat=>Math.log(Math.tan(Math.PI/4+lat*RAD/2));
+const MAP_SCALE=1000/((LON_E-LON_W)*RAD);
+const MX=lon=>(lon-LON_W)*RAD*MAP_SCALE;
+const MY=lat=>(MERC(LAT_N)-MERC(lat))*MAP_SCALE;
+function vbOf(r){const x0=MX(r.lon[0]),x1=MX(r.lon[1]),y0=MY(r.lat[1]),y1=MY(r.lat[0]);return[x0,y0,x1-x0,y1-y0];}
+function groupOf(code,groups){if(!code)return null;let best=null;for(const k in groups){if(code.startsWith(k)&&(!best||k.length>best.length))best=k;}return best;}
+
+const GEO_URLS={
+  china:'https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json',
+  shandong:'https://geo.datav.aliyun.com/areas_v3/bound/370000_full.json',
+  hebei:'https://geo.datav.aliyun.com/areas_v3/bound/130000_full.json'
+};
+const GEO_CACHE={};
+function loadGeo(key){const url=GEO_URLS[key]||GEO_URLS.china;if(!GEO_CACHE[url]){GEO_CACHE[url]=fetch(url).then(r=>r.ok?r.json():null).catch(()=>null);}return GEO_CACHE[url];}
+function geomToPath(geom){if(!geom)return'';const rings=[];if(geom.type==='Polygon')geom.coordinates.forEach(r=>rings.push(r));else if(geom.type==='MultiPolygon')geom.coordinates.forEach(p=>p.forEach(r=>rings.push(r)));return rings.map(r=>r.map((p,i)=>(i?'L':'M')+MX(p[0]).toFixed(1)+' '+MY(p[1]).toFixed(1)).join(' ')+'Z').join(' ');}
+function centroidOf(geom){let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity,n=0;const rings=geom.type==='Polygon'?geom.coordinates:geom.type==='MultiPolygon'?geom.coordinates.flat():[];rings.forEach(r=>r.forEach(p=>{n++;if(p[0]<minX)minX=p[0];if(p[0]>maxX)maxX=p[0];if(p[1]<minY)minY=p[1];if(p[1]>maxY)maxY=p[1];}));return n?[(minX+maxX)/2,(minY+maxY)/2]:null;}
+const SKIP_LABEL=new Set(['北京','天津','上海','香港','澳门','台湾']);
+const shortProvName=n=>n.replace(/(维吾尔|壮族|回族)?(自治区|特别行政区|省|市)$/,'')||n;
+const shortCityName=n=>n.replace(/(市|地区|自治州|盟)$/,'')||n;
+
+const HUANGHE=[[96.5,35.0],[100.0,35.5],[103.0,36.1],[105.7,37.5],[107.0,39.2],[109.0,40.3],[110.5,39.5],[110.4,37.5],[110.5,35.5],[110.3,34.6],[112.0,34.8],[114.0,34.9],[115.5,35.5],[117.0,36.6],[118.3,37.8]];
+const CHANGJIANG=[[91.0,33.5],[96.5,32.5],[99.0,30.0],[101.5,28.0],[104.0,28.5],[106.6,29.6],[109.0,30.8],[112.0,30.4],[114.3,30.6],[117.0,30.5],[118.8,32.0],[120.5,31.9]];
+function lineD(pts){return pts.map((p,i)=>(i?'L':'M')+MX(p[0]).toFixed(1)+' '+MY(p[1]).toFixed(1)).join(' ');}
+
+/* 解析 "名:经,纬 名:经,纬" 紧凑格式 */
+function parsePts(str){
+  return str.trim().split(/\s+/).map(s=>{
+    const [name,coord]=s.split(':');
+    const [lon,lat]=coord.split(',').map(Number);
+    return [name,lon,lat];
+  });
+}
+
+/* ========== 1. 页面① 「给」 ========== */
+const GROUPS1={
+  A1:{name:'A1 支',val:'ki~ci → tɕi',color:'#22d3ee'},
+  A2:{name:'A2 支',val:'kəi~kei → ke',color:'#34d399'},
+  A3:{name:'A3 支',val:'kʰi~cʰi → tɕʰi',color:'#a78bfa'},
+  A4:{name:'A4 支',val:'kuəi → ky / tɕy',color:'#f472b6'},
+  B1:{name:'B1 支',val:'kɯ → ki / ku',color:'#fbbf24'},
+  B2:{name:'B2 支',val:'kəʔ → kə / ke',color:'#f97316'}
+};
+const VAR1={
+  'A1':'ki~ci','A1a':'tɕi','A1a1':'tʃɿ','A2':'kəi~kei','A2a':'ke','A2b':'kɛe~kɛi','A2c':'kɐi',
+  'A3a':'kʰi~cʰi','A3a1':'tɕʰi','A3a1a':'tʃʰɿ','A3b':'kʰəi~kʰei',
+  'A4a':'kuəi~kuei','A4a1':'kuəʔ','A4b':'ky','A4b1':'ku','A4b2':'tɕy','A4b2a':'tsʮ',
+  'B1':'kɯ','B1a':'ki~ci','B1a1':'ʔi','B1a2':'iəʔ','B1b':'ku',
+  'B2':'kəʔ','B2a':'kə~kɤ','B2a0':'kəɣ','B2a1':'kʌ~kɔ','B2a2':'ke',
+  'B2a2a':'kɪ','B2a2b':'kɛ','B2a2c':'kie~kiɛ','B2a2d':'kəi~kei','B2a2d1':'kai'
+};
+
+/* 主体点（不含府辖县） */
+const P1=[
+  ['昌邑',119.40,36.86,'A1'],['赣榆',119.13,34.83,'A1'],
+  ['武城',116.08,37.21,'A1a'],['夏津',116.00,36.95,'A1a'],['潍坊',119.16,36.71,'A1a'],
+  ['莒县',118.84,35.58,'A1a'],['沂水',118.63,35.79,'A1a'],['新泰',117.77,35.91,'A1a'],
+  ['莱芜',117.68,36.21,'A1a'],['济南',117.00,36.65,'A1a'],['青州',118.48,36.70,'A1a'],
+  ['平山',114.20,38.26,'A1a'],['无极',114.97,38.18,'A1a'],['深泽',115.20,38.18,'A1a'],
+  ['定州',114.99,38.52,'A1a'],['安国',115.33,38.42,'A1a'],
+  ['鹿邑',115.49,33.86,'A1a'],['沈丘',115.07,33.41,'A1a'],['淮阳',114.89,33.73,'A1a'],
+  ['商水',114.61,33.54,'A1a'],['上蔡',114.26,33.26,'A1a'],
+  ['阜阳',115.82,32.90,'A1a','本字即“给”'],['临泉',115.26,33.06,'A1a'],['太和',115.62,33.16,'A1a'],
+  ['日照',119.53,35.42,'A1a1'],
+  ['全州',111.07,25.93,'A2'],['灌阳',110.86,25.49,'A2'],['兴安',110.67,25.61,'A2'],
+  ['桂林',110.29,25.27,'A2'],['永福',109.98,24.98,'A2'],['平乐',110.63,24.63,'A2'],
+  ['恭城',110.83,24.83,'A2'],['邯郸',114.49,36.61,'A2','kei 上声'],
+  ['临沭',118.65,34.92,'A2a'],['郯城',118.35,34.61,'A2a'],['枣庄',117.32,34.81,'A2a'],
+  ['滕州',117.16,35.09,'A2a'],['泗水',117.25,35.66,'A2a'],
+  ['徐州',117.18,34.26,'A2a'],['丰县',116.60,34.69,'A2a'],['沛县',116.94,34.72,'A2a'],
+  ['睢宁',117.95,33.91,'A2a'],['萧县',116.95,34.19,'A2a'],['砀山',116.35,34.42,'A2a'],
+  ['濉溪',116.77,33.93,'A2a'],
+  ['吴堡',110.74,37.45,'A2b'],['临县',110.99,37.95,'A2b','Leo：实读 iəʔ'],['天镇',114.08,40.42,'A2b'],
+  ['阳高',113.75,40.36,'A2b'],['怀仁',113.10,39.82,'A2b'],['左云',112.70,40.01,'A2b'],
+  ['右玉',112.47,39.99,'A2b'],['凉城',112.50,40.53,'A2b'],['兴和',113.83,40.87,'A2b'],['化德',114.01,41.90,'A2b'],
+  ['井陉',114.14,38.03,'A2c'],['荔浦',110.40,24.49,'A2c'],['柳州',109.41,24.32,'A2c'],
+  ['宜州',108.64,24.49,'A2c'],['河池',108.06,24.70,'A2c'],
+  ['荣成',122.42,37.17,'A3a'],['文登',122.06,37.19,'A3a'],['牟平',121.60,37.39,'A3a'],
+  ['海阳',121.17,36.69,'A3a'],['莱阳',120.71,36.98,'A3a'],['平度',119.96,36.79,'A3a'],
+  ['莱州北郊',119.94,37.28,'A3a','北郊与东南山读 cʰi'],
+  ['即墨',120.45,36.39,'A3a1'],['高密',119.76,36.38,'A3a1'],['胶州',120.03,36.26,'A3a1'],
+  ['诸城',119.41,35.99,'A3a1a','另读 tʃɿ（两读并存）'],
+  ['栖霞',120.83,37.31,'A3b'],['烟台',121.39,37.54,'A3b'],['长海',122.58,39.26,'A3b'],
+  ['大连',121.62,38.92,'A3b'],['庄河',122.97,39.69,'A3b'],
+  ['莱州',119.94,37.28,'A3b','方言志记 kʰəi；城区口音'],
+  ['静乐',112.00,38.36,'A4a'],['忻州',112.73,38.42,'A4a'],['定襄',112.96,38.47,'A4a'],
+  ['阳曲',112.67,38.06,'A4a'],['晋源',112.48,37.72,'A4a'],['太谷',112.55,37.42,'A4a'],
+  ['祁县',112.33,37.36,'A4a'],['文水',112.03,37.44,'A4a'],['河津',110.71,35.60,'A4a'],
+  ['韩城',110.44,35.47,'A4a'],['合阳',110.15,35.24,'A4a'],['澄城',109.93,35.19,'A4a'],
+  ['交城',112.15,37.55,'A4a1'],['清徐',112.35,37.61,'A4b'],['榆次',112.74,37.70,'A4b1'],
+  ['平遥',112.18,37.20,'A4b2'],['介休',111.92,37.03,'A4b2'],['孝义',111.78,37.15,'A4b2'],
+  ['平遥段村',112.24,37.16,'A4b2a'],['沁源王陶',112.25,36.61,'A4b2a'],
+  ['广灵',114.28,39.76,'B1'],['定边',107.60,37.59,'B1'],
+  ['兰州',103.83,36.06,'B1'],['榆中',104.11,35.85,'B1'],
+  ['蔚县',114.59,39.84,'B1','读 kɯ'],['张掖',100.45,38.93,'B1','读 kɯ'],
+  ['陕县',111.10,34.72,'B1'],['孟州',112.79,34.91,'B1'],['巩义',112.98,34.75,'B1'],
+  ['登封',113.05,34.46,'B1'],['洛宁',111.65,34.39,'B1'],['栾川',111.62,33.79,'B1'],
+  ['汝州',112.84,34.17,'B1'],['鲁山',112.91,33.74,'B1'],['南阳',112.53,33.00,'B1'],
+  ['郧县',110.82,32.83,'B1'],['郧西',110.43,32.99,'B1'],['房县',110.73,32.06,'B1'],
+  ['丹江口',111.51,32.54,'B1'],['老河口',111.68,32.38,'B1'],['襄阳',112.14,32.04,'B1'],
+  ['枣阳',112.77,32.13,'B1'],['寻甸',103.26,25.56,'B1'],
+  ['阳原',114.15,40.10,'B1a'],['灵丘',114.23,39.44,'B1a'],['浑源',113.70,39.70,'B1a'],
+  ['应县',113.19,39.55,'B1a'],['大同',113.30,40.08,'B1a'],['偏关',111.51,39.45,'B1a'],
+  ['河曲',111.14,39.38,'B1a'],['府谷',111.07,39.03,'B1a'],
+  ['东胜',109.99,39.82,'B1a'],['包头',109.84,40.66,'B1a'],['临河',107.38,40.75,'B1a'],
+  ['内黄',114.90,35.97,'B1a'],['固始',115.66,32.18,'B1a'],
+  ['南京',118.80,32.06,'B1a'],['六合',118.84,32.34,'B1a'],['庐江',117.29,31.25,'B1a'],
+  ['宜城',112.26,31.72,'B1a'],['南漳',111.84,31.78,'B1a'],['保康',111.26,31.88,'B1a'],
+  ['竹山',110.23,32.22,'B1a'],['陆良',103.67,25.03,'B1a'],['澄江',102.91,24.67,'B1a'],
+  ['玉溪',102.54,24.35,'B1a1'],['离石',111.15,37.52,'B1a2','读 iəʔ'],['中阳',111.18,37.34,'B1a2','读 iəʔ'],
+  ['洛阳',112.45,34.62,'B1b'],
+  ['榆林',109.73,38.29,'B2'],['横山',109.30,37.96,'B2'],['靖边',108.80,37.60,'B2'],
+  ['武乡',112.86,36.84,'B2'],['沁县',112.70,36.76,'B2'],['成安',114.67,36.44,'B2'],
+  ['林州',113.82,36.06,'B2'],['卫辉',114.06,35.40,'B2'],['新乡',113.88,35.30,'B2'],
+  ['获嘉',113.66,35.26,'B2'],
+  ['淮安',119.02,33.50,'B2','本字即“给”'],['涟水',119.26,33.78,'B2'],
+  ['泗阳',118.70,33.72,'B2','本字即“给”'],['盱眙',118.54,33.01,'B2'],
+  ['凤阳',117.56,32.86,'B2a'],['五河',117.89,33.14,'B2a'],['怀远',117.20,32.97,'B2a'],
+  ['凤台',116.72,32.71,'B2a'],['寿县',116.78,32.58,'B2a'],['丹寨',107.79,26.20,'B2a'],
+  ['平鲁',112.29,39.51,'B2a0','读 kəɣ'],
+  ['安宁',102.48,24.92,'B2a1'],['蒙自',103.38,23.40,'B2a1'],
+  ['定远',117.68,32.53,'B2a2'],['合肥',117.28,31.86,'B2a2'],['滁州',118.32,32.30,'B2a2'],
+  ['安庆',117.05,30.52,'B2a2'],['九江',115.99,29.71,'B2a2'],
+  ['孝感',113.92,30.92,'B2a2'],['荆门',112.20,31.03,'B2a2'],
+  ['常德',111.70,29.05,'B2a2'],
+  ['彝良',104.05,27.63,'B2a2'],['大关',103.89,27.75,'B2a2'],['永善',103.63,28.23,'B2a2'],
+  ['巧家',102.93,26.91,'B2a2'],['大理',100.23,25.60,'B2a2'],['弥渡',100.49,25.34,'B2a2'],
+  ['马关',104.40,22.99,'B2a2'],
+  ['宝应',119.32,33.24,'B2a2a'],['扬州',119.41,32.39,'B2a2a'],['仪征',119.18,32.27,'B2a2a'],
+  ['镇江',119.45,32.20,'B2a2a'],['天长',119.00,32.69,'B2a2a'],['芜湖',118.38,31.33,'B2a2a'],
+  ['魏县',114.94,36.36,'B2a2b'],['浚县',114.55,35.67,'B2a2b'],['罗山',114.53,32.20,'B2a2b'],
+  ['光山',114.90,32.01,'B2a2b'],['新县',114.88,31.64,'B2a2b'],
+  ['安陆',113.69,31.26,'B2a2b'],['汉川',113.84,30.65,'B2a2b'],['竹溪',109.72,32.32,'B2a2b'],
+  ['镇安',109.15,33.43,'B2a2b'],['柞水',109.11,33.69,'B2a2b'],['商南',110.89,33.53,'B2a2b'],
+  ['镇巴',107.90,32.54,'B2a2b'],['梁河',98.30,24.81,'B2a2b'],
+  ['霍邱',116.28,32.35,'B2a2c'],['都匀',107.52,26.26,'B2a2c'],
+  ['江浦',118.55,32.07,'B2a2d'],['六安',116.51,31.75,'B2a2d'],['舒城',116.94,31.46,'B2a2d'],
+  ['和县',118.36,31.72,'B2a2d'],['含山',118.10,31.73,'B2a2d'],['巢湖',117.87,31.60,'B2a2d'],
+  ['随州',113.38,31.72,'B2a2d'],['郫县',103.89,30.81,'B2a2d'],['建水',102.83,23.62,'B2a2d'],
+  ['石屏',102.49,23.71,'B2a2d1']
+];
+
+/* 府/州辖县：按清代辖县逐一落点 */
+const FUXIAN={
+  '武定府':{code:'A1a',pts:[
+    ['惠民',117.51,37.49],['青城',117.66,37.14],['阳信',117.58,37.64],['海丰',117.61,37.75],
+    ['乐陵',117.23,37.73],['商河',117.16,37.31],['滨州',118.03,37.39],['利津',118.25,37.49],
+    ['沾化',118.14,37.70],['蒲台',118.02,37.33]
+  ]},
+  '解州':{code:'B1',pts:[
+    ['解州',110.87,34.92],['安邑',111.00,35.02],['夏县',111.22,35.14],
+    ['平陆',111.21,34.88],['芮城',110.69,34.69]
+  ]},
+  '宁夏府':{code:'B1',pts:[
+    ['宁夏',106.28,38.47],['宁朔',106.25,38.28],['平罗',106.54,38.91],
+    ['灵州',106.34,38.10],['中卫',105.19,37.51],['宝丰',106.38,39.02]
+  ]},
+  '潞安府':{code:'B2',pts:[
+    ['长治',113.12,36.19],['长子',112.88,36.12],['屯留',112.89,36.32],['襄垣',113.05,36.54],
+    ['潞城',113.23,36.33],['壶关',113.21,36.11],['黎城',113.39,36.50],['平顺',113.44,36.20]
+  ]},
+  '泽州府':{code:'B2',pts:[
+    ['凤台',112.85,35.50],['高平',112.92,35.80],['阳城',112.42,35.49],
+    ['陵川',113.28,35.78],['沁水',112.19,35.69]
+  ]},
+  '怀庆府':{code:'B2',pts:[
+    ['河内',112.95,35.09],['济源',112.59,35.09],['修武',113.45,35.22],['武陟',113.40,35.10],
+    ['孟县',112.79,34.91],['温县',113.08,34.94],['原武',113.94,35.05]
+  ]},
+  '海州':{code:'B2a',pts:[
+    ['海州',119.16,34.60],['东海',118.77,34.54],['灌云',119.25,34.30],['沭阳',118.77,34.13]
+  ]},
+  '宜昌府':{code:'B2a',pts:[
+    ['东湖',111.29,30.69],['兴山',110.75,31.35],['巴东',110.34,31.04],['长阳',111.20,30.47],
+    ['长乐',110.67,30.20],['归州',110.98,30.83],['鹤峰',110.03,29.89]
+  ]},
+  '施南府':{code:'B2a2',pts:[
+    ['恩施',109.48,30.28],['宣恩',109.49,29.99],['来凤',109.41,29.49],
+    ['咸丰',109.15,29.68],['利川',108.94,30.29],['建始',109.72,30.60]
+  ]},
+  '澧州':{code:'B2a2',pts:[
+    ['澧县',111.76,29.63],['安乡',112.17,29.41],['石门',111.38,29.58],
+    ['慈利',111.12,29.43],['安福',111.65,29.44],['永定',110.48,29.12]
+  ]},
+  '兴安府':{code:'B2a2b',pts:[
+    ['安康',109.03,32.68],['平利',109.36,32.39],['洵阳',109.37,32.83],['白河',110.11,32.81],
+    ['紫阳',108.54,32.52],['石泉',108.25,33.04],['汉阴',108.51,32.89]
+  ]}
+};
+
+const MARKUPS1=Object.keys(FUXIAN).map(k=>{
+  const pts=FUXIAN[k].pts;
+  const c=pts[0];
+  const grp=groupOf(FUXIAN[k].code,GROUPS1);
+  return {lon:c[1],lat:c[2],r:9,label:k,color:GROUPS1[grp].color};
+});
+
+/* 区域泛称：按地级市/县市逐一落点 */
+const ZONES1=[
+  {code:'A2',label:'北方多数地区',center:[114.5,39.5],pts:parsePts(`
+    北京:116.40,39.90 天津:117.20,39.13 石家庄:114.51,38.04 唐山:118.18,39.63 秦皇岛:119.60,39.94
+    邯郸:114.49,36.61 邢台:114.50,37.07 保定:115.46,38.87 张家口:114.89,40.82 承德:117.94,40.95
+    沧州:116.84,38.30 廊坊:116.70,39.52 衡水:115.67,37.74 太原:112.55,37.87 阳泉:113.58,37.86
+    朔州:112.43,39.33 晋中:112.75,37.69 临汾:111.52,36.09 吕梁:111.14,37.52
+    呼和浩特:111.67,40.82 乌海:106.79,39.66 赤峰:118.89,42.26 通辽:122.24,43.65
+    鄂尔多斯:109.78,39.61 呼伦贝尔:119.77,49.22 巴彦淖尔:107.39,40.74 乌兰察布:113.13,40.99
+    沈阳:123.43,41.80 鞍山:122.99,41.11 抚顺:123.96,41.88 本溪:123.77,41.29 丹东:124.35,40.00
+    锦州:121.13,41.10 营口:122.22,40.67 阜新:121.67,42.02 辽阳:123.24,41.27 盘锦:122.07,41.12
+    铁岭:123.84,42.29 朝阳:120.45,41.57 葫芦岛:120.84,40.71
+    长春:125.32,43.82 吉林:126.55,43.84 四平:124.35,43.17 辽源:125.14,42.89 通化:125.94,41.73
+    白山:126.42,41.94 松原:124.82,45.14 白城:122.84,45.62
+    哈尔滨:126.53,45.80 齐齐哈尔:123.92,47.35 鸡西:130.97,45.30 鹤岗:130.28,47.35 双鸭山:131.16,46.65
+    大庆:125.10,46.59 伊春:128.84,47.73 佳木斯:130.32,46.80 七台河:131.00,45.77 牡丹江:129.63,44.55
+    黑河:127.53,50.24 绥化:126.97,46.65
+    郑州:113.63,34.75 开封:114.31,34.80 平顶山:113.19,33.77 安阳:114.39,36.10 鹤壁:114.30,35.75
+    焦作:113.24,35.22 濮阳:115.03,35.76 许昌:113.85,34.04 漯河:114.03,33.58 三门峡:111.20,34.77
+    商丘:115.65,34.44 信阳:114.09,32.15 周口:114.70,33.63 驻马店:114.02,33.00
+    西安:108.94,34.34 铜川:108.95,34.90 宝鸡:107.14,34.36 咸阳:108.71,34.33 渭南:109.51,34.50
+    延安:109.49,36.59 汉中:107.02,33.08 商洛:109.94,33.87
+    西宁:101.78,36.62 乌鲁木齐:87.62,43.82
+  `)},
+  {code:'B1',label:'甘肃河西走廊大部',center:[99.5,40.0],pts:parsePts(`
+    武威:102.63,37.93 民勤:103.09,38.62 古浪:102.89,37.47 天祝:103.14,36.97
+    金昌:102.19,38.52 永昌:101.97,38.24
+    张掖:100.45,38.93 民乐:100.81,38.43 临泽:100.16,39.13 高台:99.82,39.38 山丹:101.09,38.79 肃南:99.62,38.84
+    酒泉:98.51,39.73 玉门:97.05,39.83 金塔:98.90,39.98 瓜州:95.78,40.52 敦煌:94.66,40.14 肃北:94.88,39.51 阿克塞:94.34,39.63
+    嘉峪关:98.29,39.77
+  `)},
+  {code:'B1',label:'河南南阳府大部',center:[112.5,33.1],pts:parsePts(`
+    南召:112.43,33.49 唐河:112.81,32.68 泌阳:113.32,32.72 桐柏:113.42,32.37 镇平:112.23,33.03
+    邓州:112.09,32.69 内乡:111.85,33.05 新野:112.36,32.52 淅川:111.49,33.14 方城:113.01,33.25
+    舞阳:113.61,33.44 叶县:113.35,33.62
+  `)},
+  {code:'B2a',label:'湖北江汉平原',center:[113.0,30.7],pts:parsePts(`
+    荆州:112.24,30.33 江陵:112.42,30.04 公安:112.23,30.06 石首:112.41,29.72 监利:112.90,29.82
+    洪湖:113.47,29.83 松滋:111.77,30.18 仙桃:113.45,30.36 潜江:112.90,30.40 天门:113.17,30.66
+    京山:113.11,31.02 钟祥:112.59,31.17 应城:113.57,30.93 云梦:113.75,31.02
+  `)},
+  {code:'B2a',label:'云南大部',center:[101.5,25.0],pts:parsePts(`
+    昆明:102.71,25.04 曲靖:103.80,25.49 楚雄:101.55,25.03 保山:99.17,25.11 昭通:103.72,27.34
+    丽江:100.23,26.86 普洱:100.97,22.78 临沧:100.09,23.88 文山:104.24,23.37 景洪:100.80,22.01
+    芒市:98.59,24.43 泸水:98.86,25.82 香格里拉:99.71,27.83
+  `)},
+  {code:'B2a2',label:'四川大部',center:[104.5,30.5],pts:parsePts(`
+    成都:104.07,30.67 自贡:104.78,29.34 泸州:105.44,28.87 德阳:104.40,31.13 绵阳:104.68,31.47
+    广元:105.84,32.44 遂宁:105.59,30.53 内江:105.06,29.58 乐山:103.76,29.58 南充:106.08,30.80
+    眉山:103.85,30.08 宜宾:104.63,28.77 广安:106.63,30.46 达州:107.50,31.21 雅安:103.00,29.98
+    巴中:106.75,31.87 资阳:104.63,30.12 西昌:102.27,27.89
+  `)},
+  {code:'B2a2b',label:'贵州大部',center:[106.5,27.0],pts:parsePts(`
+    贵阳:106.63,26.65 六盘水:104.83,26.59 遵义:106.93,27.73 安顺:105.93,26.25 毕节:105.28,27.30
+    铜仁:109.19,27.72 兴义:104.90,25.09 凯里:107.98,26.58
+  `)}
+];
+
+const NOPLACE1=[
+  {code:'A2',text:'北方多数地区（60 个地级市已逐一落点）'},
+  {code:'B1',text:'甘肃河西走廊大部（20 县市已逐一落点）'},
+  {code:'B1',text:'河南南阳府大部（13 县已逐一落点）'},
+  {code:'B2',text:'潞安府 8 县 · 泽州府 5 县 · 怀庆府 7 县（已逐一落点）'},
+  {code:'B2a',text:'湖北江汉平原 14 市 · 云南大部 13 市（已逐一落点）'},
+  {code:'B2a2',text:'四川大部 18 市（已逐一落点）'},
+  {code:'B2a2b',text:'贵州大部 8 市（已逐一落点）'}
+];
+
+/* ========== 2. 页面② 山东「牛」 ========== */
+const C2={
+  '利津':[118.25,37.49],'高青':[117.83,37.17],'长山':[117.93,36.90],'章丘':[117.53,36.72],
+  '济南':[117.00,36.65],'泰安':[117.09,36.19],'莱芜':[117.68,36.21],'新泰':[117.77,35.91],
+  '寿光':[118.79,36.86],'潍坊':[119.16,36.71],'昌邑':[119.40,36.86],'安丘':[119.20,36.43],
+  '平度':[119.96,36.79],'即墨':[120.45,36.39],'青岛':[120.38,36.07],'莒县':[118.84,35.58],
+  '临沂':[118.35,35.10],'郯城':[118.35,34.61],'费县':[117.98,35.27],'平邑':[117.64,35.51],
+  '枣庄':[117.32,34.81],'滕州':[117.16,35.09],'曲阜':[116.99,35.58],'宁阳':[116.80,35.76],
+  '汶上':[116.49,35.73],'鱼台':[116.65,35.00],'金乡':[116.31,35.07],'阳谷':[115.79,36.11],
+  '博山':[117.86,36.49],'淄川':[117.97,36.64],'临淄':[118.31,36.83],'临朐':[118.54,36.51],
+  '高密':[119.76,36.38],'胶州':[120.03,36.26],'诸城':[119.41,35.99],'沂水':[118.63,35.79],
+  '日照':[119.53,35.42],'莱州':[119.94,37.28],'安丘凌河':[119.27,36.36],'胶南':[119.86,35.70],
+  '荣成':[122.42,37.17]
+};
+const GROUPS2={
+  N1:{name:'牛 = niou',val:'꜁niou~niəu',color:'#22d3ee'},
+  N0:{name:'牛 = iou',val:'꜁iou~꜁iəu',color:'#f472b6'}
+};
+const VAR2={N1:'꜁niou~niəu',N0:'꜁iou~꜁iəu'};
+function mk2(names,code,note){return names.split(/\s+/).filter(Boolean).map(n=>{const c=C2[n];return[n,c[0],c[1],code,note||''];});}
+const P2=[].concat(
+  mk2('利津 高青 长山 章丘 济南 泰安 莱芜 新泰 潍坊 昌邑 安丘 平度 即墨 青岛 莒县 临沂 郯城 费县 平邑 枣庄 滕州 曲阜 宁阳 汶上 鱼台 金乡 阳谷','N1'),
+  mk2('博山 淄川 临淄 临朐 高密 胶州 诸城 沂水 日照 安丘凌河 胶南','N0'),
+  ['莱州',119.94,37.28,'N0','Leo：一般读 Niou，“黄牛”读 iou'],
+  ['寿光',118.79,36.86,'N0','Ann：单字音即 iou'],
+  ['荣成',122.42,37.17,'N1','用于“牛栏”等；“牛子”（虫）读 iou']
+);
+const NOPLACE2=[
+  {text:'<b>莱州</b>：Leo 称一般读 Niou，“黄牛”读 iou；方言志记“给”为 kʰəi（城区口音），北郊与东南山为 cʰi。'},
+  {text:'<b>寿光</b>：Ann 称“牛”单字音即 iou，故图中列零声母组；原作将寿光列入 niou 组，此处存两说。'},
+  {text:'“牛子”（指虫）与姓氏读零声母 iou，不限于零声母区，属另一层次。'}
+];
+
+/* ========== 3. 页面③ 河北 ni- ========== */
+const C3={
+  '藁城':[114.85,38.02],'秦皇岛':[119.60,39.94],'遵化':[117.96,40.19],'兴隆':[117.50,40.42],
+  '平谷':[117.12,40.14],'北京':[116.40,39.90],'霸州':[116.39,39.11],'涞源':[114.69,39.36],
+  '保定':[115.46,38.87],'徐水':[115.66,39.02],'雄县':[116.11,38.99],'安新':[115.93,38.93],
+  '蠡县':[115.58,38.49],'博野':[115.46,38.46],'安国':[115.33,38.42],'定州':[114.99,38.52],
+  '深泽':[115.20,38.18],'无极':[114.97,38.18],'新乐':[114.68,38.35],'正定':[114.57,38.15],
+  '宁晋':[114.92,37.62],'临城':[114.50,37.44],'巨鹿':[115.03,37.22],'冀州':[115.58,37.55],
+  '衡水':[115.67,37.74],'武邑':[115.89,37.80],'深州':[115.56,38.00],'安平':[115.52,38.23],
+  '武强':[115.98,38.04],'献县':[116.14,38.19],'泊头':[116.58,38.08],'沧州':[116.84,38.30],
+  '天津':[117.20,39.13],'昌黎':[119.16,39.71],'滦州':[118.70,39.74],'滦南':[118.67,39.51],
+  '唐海':[118.46,39.28],'栾城':[114.65,37.90],'内丘':[114.51,37.29],'隆尧':[114.77,37.35],
+  '肃宁':[115.83,38.42],'青龙':[118.95,40.41],'唐山':[118.18,39.63],'丰润':[118.16,39.83],
+  '定兴':[115.81,39.26],'满城':[115.32,38.95],'河间':[116.10,38.44],'乐亭':[118.91,39.43]
+};
+const GROUPS3={
+  G1:{name:'宜',val:'꜁ni（宜安）',color:'#22d3ee'},
+  G2:{name:'言',val:'꜁nian / ꜂nian',color:'#34d399'},
+  G3:{name:'酽',val:'nian꜄',color:'#a78bfa'},
+  G4:{name:'仰',val:'꜂niɑŋ / ꜁niɑŋ',color:'#f472b6'},
+  G5:{name:'衣',val:'꜀ni',color:'#fbbf24'},
+  G6:{name:'有',val:'꜂niou',color:'#f97316'},
+  G7:{name:'掩',val:'nian꜄',color:'#2dd4bf'},
+  G8:{name:'堰',val:'nian꜄ / ꜂nian',color:'#c084fc'},
+  G9:{name:'鞅',val:'niɑŋ꜄',color:'#facc15'}
+};
+const VAR3={G1:'꜁ni',G2:'꜁nian / ꜂nian',G3:'nian꜄',G4:'꜂niɑŋ / ꜁niɑŋ',G5:'꜀ni',G6:'꜂niou',G7:'nian꜄',G8:'nian꜄ / ꜂nian',G9:'niɑŋ꜄'};
+function mk3(names,code,note){return names.split(/\s+/).filter(Boolean).map(n=>{const c=C3[n];return[n,c[0],c[1],code,note||''];});}
+const P3=[].concat(
+  ['藁城',C3['藁城'][0],C3['藁城'][1],'G1','地名“宜安”'],
+  mk3('秦皇岛 遵化 兴隆 平谷 北京 霸州 涞源 保定 徐水 雄县 安新 蠡县 博野 安国 定州 深泽 无极 新乐 正定 宁晋 临城 巨鹿 冀州 衡水 武邑 深州 安平 武强 献县 泊头 沧州 天津','G2','“（不）言语 / 言声儿 / 言应”'),
+  mk3('昌黎 滦州 滦南 唐海','G3','义为“浓”'),
+  mk3('唐海 保定 徐水 安新 蠡县 博野 安国 定州 深泽 无极 新乐 藁城 栾城 宁晋 临城 内丘 隆尧 巨鹿 衡水 武邑 深州 安平 武强 肃宁','G4','上声＝躺卧；阳平＝抬头'),
+  mk3('青龙 昌黎 滦州 唐海 唐山 丰润 遵化 兴隆 平谷 霸州 定兴 保定 满城 安新 深泽 无极 冀州 衡水 武邑 深州 安平 肃宁 河间 献县','G5','“衣（胞）”（胎盘）'),
+  ['涞源',C3['涞源'][0],C3['涞源'][1],'G6','“没有”'],
+  mk3('昌黎 武邑 深州','G7','“掩襟”'),
+  mk3('昌黎 滦州 唐海 无极 巨鹿 衡水 武邑 献县','G8','义为“土堤”，俗作“埝”'),
+  mk3('乐亭 滦州 滦南 唐山 平谷','G9','“牛鞅子”（牛轭）')
+);
+const NOPLACE3=[
+  {text:'<b>孽</b> niɛ꜄（本字“业”）：各地普遍，无定点。'},
+  {text:'<b>蔫</b> ꜀nian（枯萎）：各地普遍，无定点。'},
+  {text:'<b>倪、拟、虐</b>等口语不常用的疑母字读 ni-，可能借自南京官话。'},
+  {text:'疑、影、喻母<b>四等</b>开口常用字基本读零声母，反映韵图时代三、四等对立。'}
+];
+
+/* ========== 4. 页面④ 知澄母白读 t ========== */
+const GROUPS4={
+  T1:{name:'知澄白读 t · 粤语',val:'四会 / 广宁 / 怀集 / 阳山 / 连州 / 开建 / 贺州铺门',color:'#22d3ee'},
+  T2:{name:'同类现象 · 其他方言',val:'湘赣 / 南岭土话 / 吴语',color:'#34d399'},
+  T3:{name:'外围分布 · 部分字白读',val:'湘语 / 湘南土话 / 赣语 / 粤客',color:'#fbbf24'},
+  T4:{name:'其他演化 · 零声母',val:'汝城 / 乳源桂头 / 四邑',color:'#f472b6'},
+  T5:{name:'特殊对立 · 安福',val:'t- 细音 vs t- 洪音',color:'#a78bfa'}
+};
+const VAR4={
+  T1:'t（与章组 tʃ/ts 对立）',T2:'t（与端组同、与章组对立）',
+  T3:'t（部分字白读）',T4:'零声母（与端、章均不对立）',T5:'t- 细音白读 / t- 洪音来自 tʂ→ʈ→t'
+};
+const P4=[
+  ['四会',112.73,23.33,'T1','知 tɐi / 猪 tøi / 张 tøŋ'],
+  ['广宁',112.44,23.63,'T1','知 tɐi / 猪 tøy / 张 tyŋ'],
+  ['怀集',112.19,23.92,'T1','知 tɐi / 猪 tøy / 张 tø̃'],
+  ['阳山',112.64,24.47,'T1','知 tɐi / 猪 tɔy / 张 tiœŋ'],
+  ['连州',112.38,24.78,'T1','四会声 / 猪 tœy / 张 tyŋ'],
+  ['开建',111.51,23.75,'T1','今封开南丰 / 猪 tœy / 张 tø̃'],
+  ['贺州铺门',111.62,24.02,'T1','猪 toi / 张 tø̃'],
+  ['晴隆长流',105.22,25.83,'T2','贵州 / 知 tai / 猪 ty'],
+  ['永新',114.24,26.94,'T2','知 te / 猪 tiəu'],
+  ['莲花',113.96,27.13,'T2'],['宁冈',114.17,26.75,'T2','今井冈山'],
+  ['攸县',113.35,27.00,'T2'],['炎陵',113.77,26.49,'T2'],
+  ['东安',111.31,26.39,'T2','东安花桥 / 知 ta'],['江永',111.34,25.27,'T2'],
+  ['绥宁关峡',110.16,26.55,'T2'],['资源',110.65,26.04,'T2'],
+  ['义宁',110.15,25.37,'T2','今临桂五通 / 猪 tɔu'],
+  ['全州文桥',111.10,25.98,'T2','猪 tɔu'],['兴安高尚',110.72,25.55,'T2','猪 tɑ'],
+  ['乐昌北乡',113.35,25.13,'T2','知 tɛ / 猪 tœ'],['韶关犁市',113.55,24.90,'T2'],
+  ['丽水',119.92,28.45,'T2','知 tɿ / 猪 ty'],['云和',119.57,28.11,'T2'],
+  ['松阳',119.48,28.45,'T2'],['宣平',119.80,28.70,'T2','今武义柳城'],
+  ['青田',120.29,28.14,'T2'],['景宁',119.63,27.97,'T2'],['龙泉',119.14,28.07,'T2'],
+  ['庆元',119.06,27.62,'T2'],['遂昌',119.27,28.59,'T2'],
+  ['江山',118.63,28.74,'T2','知 tɕie'],['常山',118.51,28.90,'T2','知 tsuə'],
+  ['开化',118.42,29.14,'T2'],['玉山',118.24,28.68,'T2'],['广丰',118.19,28.44,'T2'],
+  ['上饶沙溪',118.10,28.55,'T2'],
+  ['吉安云楼',115.00,27.10,'T3','猪 ty / 张 tiɔŋ / 竹 tiu'],
+  ['泰和',114.91,26.79,'T3','猪拄 ty / 砧 tĩ'],['遂川',114.17,26.32,'T3','猪 ty / 着 tioʔ'],
+  ['宜章栗源',112.95,25.40,'T3','猪 ty / 中 toŋ'],['桂阳六合',112.73,25.75,'T3','转 tyã / 竹 tiəu'],
+  ['祁阳',111.84,26.58,'T3','砧 tin / 张 tiaŋ'],['衡阳西渡',112.37,26.95,'T3','砧沉 tin / 胀 tian'],
+  ['洞口石江',110.55,27.10,'T3','砧 tẽ / 中 tɤ̃'],['隆回横板桥',110.94,27.12,'T3','朝 tiəu / 张 tiaŋ'],
+  ['新化',111.30,27.73,'T3','朝 tiə / 砧 tin'],['湘潭',112.94,27.83,'T3','砧 tin'],
+  ['益阳',112.36,28.55,'T3','砧 tin'],
+  ['廉江',110.27,21.61,'T3','知 tei'],['高州',110.85,21.92,'T3','知 tɛi'],['信宜',110.94,22.35,'T3','知 tei'],
+  ['恩平',112.30,22.18,'T3','知 ti / 砧 tiam'],['新会',113.03,22.46,'T3','知 tei'],
+  ['斗门',113.30,22.21,'T3','知 tei / 砧 tɐm'],['宝安',113.88,22.55,'T3','知 tɐi'],
+  ['东莞',113.75,23.02,'T3','知 tɐi'],['增城',113.81,23.29,'T3','知 tei'],
+  ['惠州',114.41,23.11,'T3','知 ti'],['梅州',116.11,24.29,'T3','知 ti / 中 tuŋ'],
+  ['汝城',113.68,25.55,'T4','知母白读零声母：朝 iau / 昼 iəu'],
+  ['乳源桂头',113.28,24.95,'T4','都=猪 au / 刁=朝 ɛi'],
+  ['台山',112.79,22.25,'T4','“知 / 砧”白读零声母'],
+  ['开平',112.70,22.37,'T4','同上'],['鹤山雅瑶',112.94,22.72,'T4','同上'],
+  ['安福',114.62,27.39,'T5','砧 tĩ≠针 tẽ / 张 tiɔ̃≠樟 tɔ̃ / 竹 tio≠粥 to']
+];
+const NOPLACE4=[
+  {text:'<b>闽语</b>：知、澄母三等归端组，彻母三等也读 tʰ，且与昌母对立，属另一演化规则。'},
+  {text:'<b>部分湘、赣语</b>：发生过 tʂ→ʈ→t，既含知组三等也含大量章组字，不属本类。'},
+  {text:'<b>江西安福</b>：砧 tĩ≠针 tẽ、张 tiɔ̃≠樟 tɔ̃、竹 tio≠粥 to；t- 细音为知母白读，t- 洪音来自 tʂ→ʈ→t。'},
+  {text:'<b>晋语 / 西北方言</b>：端组细音在送气条件下塞擦化（彬县：梯=妻 tsʰi），可类比彻母并入昌母。'}
+];
+
+/* ========== 5. 页面配置 ========== */
+const PAGES=[
+  {
+    id:'p1',tab:'① “给（～你）”音变',title:'“给（～你）”音变地理分布',geo:'china',
+    intro:`<b>A 支</b>：<span class="k">*kɨp → *kɨt → *kɨiʔ → *kɨi</span>；<b>B 支</b>：<span class="k">*kɨʔ → *kɯʔ</span>。
+      <b>本字讨论</b>：淮安、海州、泗阳 k-入声，阜阳、寿光、利津 tɕi，蔚县、芮城、张掖 kɯ，本字均为“给”；kei 与 k-入声相邻、与 tɕi 及 kɯ 交错，本字亦当为“给”。临县、离石、中阳 iəʔ 可能来自 *tɕiəʔ 或“予”促化。`,
+    groups:GROUPS1,variants:VAR1,points:P1,fuxian:FUXIAN,zones:ZONES1,
+    views:{
+      '全国':{lon:[73,136],lat:[18,54]},'武定府':{lon:[116.5,118.6],lat:[36.85,38.05]},
+      '晋中':{lon:[111.2,114.6],lat:[35.8,39.4]},'山东半岛':{lon:[119.0,123.2],lat:[35.8,38.3]},
+      '江淮':{lon:[116.0,121.0],lat:[29.5,34.5]},'西南':{lon:[98.0,106.5],lat:[21.5,30.5]},
+      '岭南':{lon:[106.0,112.5],lat:[22.5,26.5]}
+    },
+    defaultView:'全国',rankBy:'code',rankTitle:'覆盖点最多的变体',
+    searchHint:'搜索地名 / 音值 / 编号 / 府名',noplaceTitle:'区域泛称（点击高亮）',
+    noplace:NOPLACE1,baseR:4.5,spread:5
+  },
+  {
+    id:'p2',tab:'② 山东“牛”读音',title:'山东方言“牛”指牲畜时的读音',geo:'shandong',
+    intro:`“牛”指牲畜时，<b>꜁niou~niəu</b> 覆盖鲁西北、鲁中、鲁南及胶莱平原大部；零声母 <b>꜁iou~꜁iəu</b> 一般限于“牛子”（虫）及姓氏，仅博山、淄川、临淄、临朐、高密、胶州、诸城、沂水、日照及莱州、安丘凌河、胶南指牲畜时仍读零声母；寿光据 Ann 单字音亦为 iou，荣成“牛栏”读 niou。底图：山东省地级市界。`,
+    groups:GROUPS2,variants:VAR2,points:P2,fuxian:null,zones:null,
+    views:{
+      '山东':{lon:[114.5,123.5],lat:[34.0,38.6]},'鲁西北':{lon:[115.3,119.0],lat:[36.3,38.2]},
+      '鲁中':{lon:[116.5,119.2],lat:[35.5,37.2]},'胶东':{lon:[119.0,123.2],lat:[35.4,37.9]},
+      '鲁南':{lon:[115.5,119.2],lat:[34.2,35.9]}
+    },
+    defaultView:'山东',rankBy:'group',rankTitle:'两类读音覆盖点',
+    searchHint:'搜索地名或读音，如：莱州、即墨、iou',noplaceTitle:'补充说明',
+    noplace:NOPLACE2,baseR:5.5,spread:6
+  },
+  {
+    id:'p3',tab:'③ 河北 ni- 白读',title:'河北方言疑、影、喻母三等开口读 ni-',geo:'hebei',
+    intro:`河北方言中，疑、影、喻母三等开口皆有读 <b>ni-</b> 的白读，且多见于口语常用词，应是固有层次。宜、言、酽、仰、衣、有、掩、堰、鞅等字有定点；孽（本字“业”）、蔫原文记作“各地普遍”，不列点。疑、影、喻母<b>四等</b>开口常用字基本读零声母，反映三、四等对立。底图：河北省地级市界。`,
+    groups:GROUPS3,variants:VAR3,points:P3,fuxian:null,zones:null,
+    views:{
+      '河北':{lon:[113.5,120.5],lat:[36.3,41.2]},'冀东':{lon:[117.0,120.5],lat:[38.8,41.2]},
+      '冀中':{lon:[114.4,117.2],lat:[38.0,40.3]},'冀南':{lon:[113.6,116.4],lat:[36.4,38.4]}
+    },
+    defaultView:'河北',rankBy:'group',rankTitle:'各字覆盖点数',
+    searchHint:'搜索地名 / 字，如：保定、言、꜂niɑŋ',noplaceTitle:'无定点的字与补充',
+    noplace:NOPLACE3,baseR:3.6,spread:4.2
+  },
+  {
+    id:'p4',tab:'④ 知澄母三等白读 t',title:'知、澄母三等白读 t 的地理分布',geo:'china',
+    intro:`知、澄母三等白读归端组且与章组对立，最典型的是粤语四会、广宁、怀集、阳山、连州（四会声）、开建、贺州铺门；类似现象还见于湘语（晴隆长流）、赣语（永新、莲花、宁冈、攸县、炎陵）、南岭土话（东安、江永、绥宁关峡、资源、义宁、全州文桥、兴安高尚、乐昌北乡、韶关犁市）与吴语（丽水、云和、松阳、宣平、青田、景宁、龙泉、庆元、遂昌、江山、常山、开化、玉山、广丰、上饶沙溪）。外围分布见湘语、湘南土话、赣语及粤客若干点；另有零声母演化（汝城、乳源桂头、四邑）与安福特有对立。`,
+    groups:GROUPS4,variants:VAR4,points:P4,fuxian:null,zones:null,
+    views:{
+      '全国':{lon:[73,136],lat:[18,54]},'华南':{lon:[105,120],lat:[20,29]},
+      '湘赣':{lon:[108,118],lat:[24,30]},'浙西南':{lon:[117,122],lat:[27,30]},
+      '粤中粤西':{lon:[109,116],lat:[21,25]}
+    },
+    defaultView:'全国',rankBy:'group',rankTitle:'各类覆盖点数',
+    searchHint:'搜索地名 / 类别，如：四会、安福、零声母',noplaceTitle:'补充说明',
+    noplace:NOPLACE4,baseR:4.2,spread:5
+  }
+];
+
+/* ========== 6. 地图应用 ========== */
+function createApp(root,cfg){
+  root.innerHTML=`
+    <div class="intro">${cfg.intro||''}</div>
+    <div class="stats"></div>
+    <div class="layout">
+      <div class="card">
+        <h2>${cfg.title} <em>滚轮缩放 / 拖拽平移</em></h2>
+        <div class="views"></div>
+        <div class="mapWrap">
+          <svg class="map" viewBox="0 0 1000 732" preserveAspectRatio="xMidYMid meet"></svg>
+          <div class="loading">正在加载底图…</div>
+          <div class="tip"></div>
+        </div>
+        <div class="legend"></div>
+      </div>
+      <div class="side">
+        <div class="card"><h2>检索</h2>
+          <input type="search" class="search" placeholder="${cfg.searchHint||'搜索'}">
+        </div>
+        <div class="card grow">
+          <h2>${cfg.rankTitle||'排行'} <em>点击定位高亮</em></h2>
+          <ul class="rank"></ul>
+        </div>
+        <div class="card">
+          <h2>${cfg.noplaceTitle||'区域泛称'}</h2>
+          <ul class="noplace"></ul>
+        </div>
+      </div>
+    </div>`;
+
+  const svg=root.querySelector('.map'), wrap=root.querySelector('.mapWrap'), tip=root.querySelector('.tip');
+  const statsEl=root.querySelector('.stats'), legendEl=root.querySelector('.legend');
+  const viewsEl=root.querySelector('.views'), rankEl=root.querySelector('.rank');
+  const noplaceEl=root.querySelector('.noplace'), searchEl=root.querySelector('.search');
+  const loadingEl=root.querySelector('.loading');
+
+  const gGrid=el('g'),gLand=el('g'),gRiver=el('g'),gLabel=el('g'),gMark=el('g'),gBub=el('g');
+  svg.append(gGrid,gLand,gRiver,gLabel,gMark,gBub);
+
+  const labelEls=[], bubbles=[], hiddenGroup={}, searchState={v:''};
+  let hiKey=null, hiMode=null, curVB=null;
+
+  for(let lon=75;lon<=135;lon+=5)gGrid.appendChild(el('line',{class:'gridline',x1:MX(lon),y1:MY(54),x2:MX(lon),y2:MY(18)}));
+  for(let lat=20;lat<=50;lat+=5)gGrid.appendChild(el('line',{class:'gridline',x1:MX(73),y1:MY(lat),x2:MX(135.5),y2:MY(lat)}));
+
+  if(cfg.geo==='china'){
+    gRiver.appendChild(el('path',{class:'river',d:lineD(HUANGHE)}));
+    gRiver.appendChild(el('path',{class:'river',d:lineD(CHANGJIANG)}));
+  }
+
+  function drawGeo(geo){
+    gLand.innerHTML=''; gLabel.innerHTML=''; labelEls.length=0;
+    const isCity=cfg.geo!=='china';
+    geo.features.forEach(f=>{
+      const d=geomToPath(f.geometry); if(!d)return;
+      const p=el('path',{class:'land',d});
+      p.appendChild(el('title',{})).textContent=f.properties.name||'';
+      gLand.appendChild(p);
+    });
+    geo.features.forEach(f=>{
+      const nm=f.properties.name||'';
+      if(!isCity&&SKIP_LABEL.has(nm))return;
+      const c=f.properties.center||f.properties.cp||centroidOf(f.geometry); if(!c)return;
+      const fs=isCity?8:10.5;
+      const t=el('text',{class:'plabel',x:MX(c[0]),y:MY(c[1]),'font-size':fs});
+      t.dataset.fs=String(fs);
+      t.textContent=isCity?shortCityName(nm):shortProvName(nm);
+      gLabel.appendChild(t); labelEls.push(t);
+    });
+    if(curVB)render();
+  }
+  loadGeo(cfg.geo).then(geo=>{
+    if(geo){drawGeo(geo);if(loadingEl){loadingEl.style.opacity=0;setTimeout(()=>{if(loadingEl.parentNode)loadingEl.remove();},400);}}
+    else if(loadingEl){loadingEl.textContent='底图加载失败（请检查网络）';}
+  });
+
+  /* 府/州：虚线圈 + 治所名 */
+  function buildMarkups(){
+    if(!cfg.fuxian)return;
+    Object.keys(cfg.fuxian).forEach(k=>{
+      const pts=cfg.fuxian[k].pts, c=pts[0];
+      const grp=groupOf(cfg.fuxian[k].code,cfg.groups);
+      const color=GROUPS1[grp]?GROUPS1[grp].color:'#94a3b8';
+      const cx=MX(c[1]),cy=MY(c[2]),r=11;
+      gMark.appendChild(el('circle',{cx,cy,r,
+        fill:color,'fill-opacity':.05,stroke:color,'stroke-opacity':.5,
+        'stroke-width':1,'stroke-dasharray':'3 3','vector-effect':'non-scaling-stroke'}));
+      const t=el('text',{class:'mlabel',x:cx+r+2.5,y:cy-r+2,
+        fill:color,'fill-opacity':.85,'font-size':8.5,'dominant-baseline':'middle'});
+      t.dataset.fs='8.5'; t.textContent=k;
+      gMark.appendChild(t); labelEls.push(t);
+    });
+  }
+
+  /* 主体气泡：同坐标环形偏移 */
+  function buildBubbles(){
+    gBub.innerHTML=''; bubbles.length=0;
+    const byPos={};
+    cfg.points.forEach((d,i)=>{
+      const key=d[1].toFixed(4)+','+d[2].toFixed(4);
+      (byPos[key]=byPos[key]||[]).push(i);
+    });
+    const offs=new Array(cfg.points.length).fill(null);
+    Object.values(byPos).forEach(list=>{
+      list.forEach((idx,k)=>{
+        if(list.length===1){offs[idx]=[0,0];return;}
+        const ring=Math.floor(k/6);
+        const ang=(k%6)*Math.PI/3+ring*0.55;
+        const rr=cfg.spread*(0.9+ring*0.8);
+        offs[idx]=[Math.cos(ang)*rr,Math.sin(ang)*rr];
+      });
+    });
+    cfg.points.forEach((d,i)=>{
+      const [name,lon,lat,code,note]=d;
+      const grp=groupOf(code,cfg.groups);
+      const color=grp?cfg.groups[grp].color:'#94a3b8';
+      const [ox,oy]=offs[i];
+      const x=MX(lon)+ox, y=MY(lat)+oy;
+      const g=el('g',{class:'bub','data-i':i});
+      const body=el('circle',{class:'body',cx:0,cy:0,r:cfg.baseR,
+        fill:color,'fill-opacity':note?.12:.35,
+        stroke:color,'stroke-opacity':note?.7:.95,
+        'stroke-dasharray':note?'2.2 2.2':'none'});
+      const hit=el('circle',{class:'hit',cx:0,cy:0,r:cfg.baseR+5});
+      g.append(body,hit); gBub.appendChild(g);
+      bubbles.push({g,body,hit,name,lon,lat,code,grp,note,color,x,y,i});
+    });
+  }
+
+  /* 府辖县：实心小点，与主体同 code，note 记府名 */
+  function buildFuxian(){
+    if(!cfg.fuxian)return;
+    Object.keys(cfg.fuxian).forEach(fname=>{
+      const code=cfg.fuxian[fname].code;
+      const grp=groupOf(code,cfg.groups);
+      const color=grp?cfg.groups[grp].color:'#94a3b8';
+      cfg.fuxian[fname].pts.forEach(p=>{
+        const [name,lon,lat]=p;
+        const x=MX(lon), y=MY(lat);
+        const g=el('g',{class:'bub'});
+        const body=el('circle',{class:'body',cx:0,cy:0,r:cfg.baseR*.82,
+          fill:color,'fill-opacity':.28,
+          stroke:color,'stroke-opacity':.8,'stroke-width':.9});
+        const hit=el('circle',{class:'hit',cx:0,cy:0,r:cfg.baseR+4});
+        g.append(body,hit); gBub.appendChild(g);
+        bubbles.push({g,body,hit,name,lon,lat,code,grp,note:fname+'辖',color,x,y,isFuxian:true});
+      });
+    });
+  }
+
+  /* 泛称区域：按县市逐一落点，小虚线圆圈 */
+  function buildZones(){
+    if(!cfg.zones)return;
+    cfg.zones.forEach(z=>{
+      const grp=groupOf(z.code,cfg.groups);
+      const color=grp?cfg.groups[grp].color:'#94a3b8';
+      z.pts.forEach(p=>{
+        const [name,lon,lat]=p;
+        const x=MX(lon), y=MY(lat);
+        const g=el('g',{class:'bub'});
+        const body=el('circle',{class:'body',cx:0,cy:0,r:2.8,
+          fill:color,'fill-opacity':.18,
+          stroke:color,'stroke-opacity':.5,
+          'stroke-width':.8,'stroke-dasharray':'1.6 1.6'});
+        const hit=el('circle',{class:'hit',cx:0,cy:0,r:6});
+        g.append(body,hit); gBub.appendChild(g);
+        bubbles.push({g,body,hit,name,lon,lat,code:z.code,grp,note:'',color,x,y,isZone:true,zoneLabel:z.label});
+      });
+      const lx=MX(z.center[0]), ly=MY(z.center[1]);
+      const lt=el('text',{class:'zonelabel',x:lx,y:ly,
+        fill:color,'fill-opacity':.85,'font-size':10,'font-weight':600});
+      lt.dataset.fs='10'; lt.textContent=z.label;
+      gMark.appendChild(lt); labelEls.push(lt);
+    });
+  }
+
+  function render(){
+    if(!curVB)return;
+    svg.setAttribute('viewBox',curVB.join(' '));
+    wrap.style.aspectRatio=curVB[2]+' / '+curVB[3];
+    const s=curVB[2]/1000;
+    bubbles.forEach(b=>b.g.setAttribute('transform',`translate(${b.x},${b.y}) scale(${s})`));
+    labelEls.forEach(t=>{
+      const base=parseFloat(t.dataset.fs||'10.5');
+      t.setAttribute('font-size',(base*s).toFixed(2));
+    });
+  }
+  function setView(vb){curVB=vb.slice();render();}
+
+  Object.keys(cfg.views).forEach(k=>{
+    const btn=document.createElement('button');
+    btn.textContent=k;
+    if(k===cfg.defaultView)btn.classList.add('on');
+    btn.addEventListener('click',()=>{
+      [...viewsEl.children].forEach(b=>b.classList.remove('on'));
+      btn.classList.add('on'); setView(vbOf(cfg.views[k]));
+    });
+    viewsEl.appendChild(btn);
+  });
+
+  Object.keys(cfg.groups).forEach(g=>{
+    const info=cfg.groups[g];
+    const cnt=cfg.points.filter(p=>groupOf(p[3],cfg.groups)===g).length
+      + (cfg.fuxian?Object.values(cfg.fuxian).filter(f=>groupOf(f.code,cfg.groups)===g).reduce((s,f)=>s+f.pts.length,0):0)
+      + (cfg.zones?cfg.zones.filter(z=>groupOf(z.code,cfg.groups)===g).reduce((s,z)=>s+z.pts.length,0):0);
+    const lg=document.createElement('div');
+    lg.className='lg';
+    lg.innerHTML=`<i style="background:${info.color}"></i>
+      <span class="nm">${info.name}</span><span class="vv">${info.val}</span><span class="ct">${cnt}</span>`;
+    lg.addEventListener('click',()=>{hiddenGroup[g]=!hiddenGroup[g];lg.classList.toggle('off',!!hiddenGroup[g]);applyFilter();});
+    legendEl.appendChild(lg);
+  });
+
+  function applyFilter(){
+    const q=searchState.v;
+    bubbles.forEach(b=>{
+      let show=!hiddenGroup[b.grp];
+      if(show&&q){
+        const hay=(b.name+' '+b.code+' '+(cfg.variants[b.code]||'')+' '+(b.note||'')+' '+(b.zoneLabel||'')).toLowerCase();
+        show=hay.indexOf(q)!==-1;
+      }
+      if(show&&hiKey)show=(hiMode==='code')?(b.code===hiKey):(b.grp===hiKey);
+      b.g.classList.toggle('dim',!show);
+    });
+  }
+  searchEl.addEventListener('input',e=>{searchState.v=e.target.value.trim().toLowerCase();applyFilter();});
+
+  function showTip(ev,b){
+    const info=cfg.groups[b.grp]||{name:b.grp,color:'#94a3b8'};
+    let html=`<div class="t">${b.name}</div>`;
+    if(b.isZone){
+      html+=`<div><span class="k">泛称区</span><span class="v">${b.zoneLabel}</span></div>`;
+      html+=`<div style="margin-top:3px;color:#94a3b8;font-size:11.5px;white-space:normal;max-width:260px">该区未明确排除者默认属此读音。</div>`;
+    }else{
+      const val=cfg.variants[b.code]||'—';
+      html+=`<div><span class="k">音值</span><span class="v vv" style="color:${info.color}">${val}</span>`
+        +`<span class="badge" style="color:${info.color}">${b.code}</span></div>`;
+      html+=`<div><span class="k">所属</span><span class="v">${info.name}</span></div>`;
+      if(b.note)html+=`<div style="margin-top:3px;color:#94a3b8;font-size:11.5px;white-space:normal;max-width:260px">${b.note}</div>`;
+    }
+    tip.innerHTML=html;
+    const rect=wrap.getBoundingClientRect();
+    tip.style.opacity=1;
+    let x=ev.clientX-rect.left+16, y=ev.clientY-rect.top+16;
+    const tw=tip.offsetWidth,th=tip.offsetHeight;
+    if(x+tw>rect.width-8)x=ev.clientX-rect.left-tw-16;
+    if(y+th>rect.height-8)y=ev.clientY-rect.top-th-16;
+    tip.style.transform=`translate(${Math.max(4,x)}px, ${Math.max(4,y)}px)`;
+  }
+  const hideTip=()=>{tip.style.opacity=0;};
+  gBub.addEventListener('mouseover',e=>{const g=e.target.closest('.bub');if(!g)return;const b=bubbles.find(x=>x.g===g);if(b)showTip(e,b);});
+  gBub.addEventListener('mousemove',e=>{const g=e.target.closest('.bub');if(!g)return;const b=bubbles.find(x=>x.g===g);if(b)showTip(e,b);});
+  gBub.addEventListener('mouseout',e=>{if(e.target.closest('.bub'))hideTip();});
+
+  function buildRank(){
+    const cnt={}; let list;
+    if(cfg.rankBy==='code'){
+      cfg.points.forEach(p=>{cnt[p[3]]=(cnt[p[3]]||0)+1;});
+      list=Object.keys(cnt).map(k=>({key:k,n:cnt[k],grp:groupOf(k,cfg.groups)})).sort((a,b)=>b.n-a.n).slice(0,15);
+    }else{
+      cfg.points.forEach(p=>{const g=groupOf(p[3],cfg.groups);cnt[g]=(cnt[g]||0)+1;});
+      list=Object.keys(cnt).map(k=>({key:k,n:cnt[k],grp:k})).sort((a,b)=>b.n-a.n);
+    }
+    const max=list.length?list[0].n:1;
+    rankEl.innerHTML=list.map((d,i)=>{
+      const info=cfg.groups[d.grp]||{name:d.grp,val:'',color:'#94a3b8'};
+      const w=(d.n/max)*100;
+      if(cfg.rankBy==='code'){
+        return `<li data-key="${d.key}" data-mode="code">
+          <div class="bar" style="width:${w}%;background:${info.color}"></div>
+          <span class="nm">${i+1}. <b style="color:${info.color}">${cfg.variants[d.key]||d.key}</b><em>${d.key}</em></span>
+          <span class="nu">${d.n} 处</span></li>`;
+      }
+      return `<li data-key="${d.key}" data-mode="group">
+        <div class="bar" style="width:${w}%;background:${info.color}"></div>
+        <span class="nm">${i+1}. <b style="color:${info.color}">${info.name}</b><em>${info.val}</em></span>
+        <span class="nu">${d.n} 处</span></li>`;
+    }).join('');
+    rankEl.querySelectorAll('li').forEach(li=>{
+      li.addEventListener('click',()=>{
+        const key=li.dataset.key,mode=li.dataset.mode;
+        if(hiKey===key&&hiMode===mode){hiKey=null;hiMode=null;}else{hiKey=key;hiMode=mode;}
+        rankEl.querySelectorAll('li').forEach(x=>x.classList.toggle('sel',x.dataset.key===hiKey&&x.dataset.mode===hiMode));
+        applyFilter();
+      });
+    });
+  }
+
+  function buildNoplace(){
+    noplaceEl.innerHTML='';
+    (cfg.noplace||[]).forEach(item=>{
+      const li=document.createElement('li');
+      if(item.code){
+        const grp=groupOf(item.code,cfg.groups);
+        const color=grp?cfg.groups[grp].color:'#94a3b8';
+        li.innerHTML=`<b style="color:${color};font-family:'Charis SIL','Doulos SIL',serif">${cfg.variants[item.code]||item.code}</b>
+          <span style="color:#7c8899">${item.code}</span><br>${item.text}`;
+        li.classList.add('click');
+        li.addEventListener('click',()=>{
+          if(hiKey===item.code&&hiMode==='code'){hiKey=null;hiMode=null;}else{hiKey=item.code;hiMode='code';}
+          rankEl.querySelectorAll('li').forEach(x=>x.classList.toggle('sel',x.dataset.key===hiKey&&x.dataset.mode===hiMode));
+          applyFilter();
+        });
+      }else{li.innerHTML=item.text;}
+      noplaceEl.appendChild(li);
+    });
+  }
+
+  function buildStats(){
+    let cards;
+    const fuxianCount=cfg.fuxian?Object.values(cfg.fuxian).reduce((s,f)=>s+f.pts.length,0):0;
+    const zoneCount=cfg.zones?cfg.zones.reduce((s,z)=>s+z.pts.length,0):0;
+    if(cfg.id==='p1'){
+      const codes=Object.keys(cfg.variants).length;
+      const g={};
+      cfg.points.forEach(p=>{const k=groupOf(p[3],cfg.groups);g[k]=(g[k]||0)+1;});
+      Object.values(cfg.fuxian||{}).forEach(f=>{const k=groupOf(f.code,cfg.groups);g[k]=(g[k]||0)+f.pts.length;});
+      Object.values(cfg.zones||{}).forEach(z=>{const k=groupOf(z.code,cfg.groups);g[k]=(g[k]||0)+z.pts.length;});
+      const topG=Object.keys(g).sort((a,b)=>g[b]-g[a])[0];
+      cards=[
+        ['定点方言点',cfg.points.length+' 处'],
+        ['府辖县',fuxianCount+' 点'],
+        ['泛称区落点',zoneCount+' 点'],
+        ['音变变体',codes+' 支'],
+        ['最大组',`${cfg.groups[topG].name} · ${g[topG]} 点`]
+      ];
+    }else if(cfg.id==='p2'){
+      const n1=cfg.points.filter(p=>p[3]==='N1').length;
+      const n0=cfg.points.filter(p=>p[3]==='N0').length;
+      cards=[['定点',cfg.points.length+' 处'],['读 niou~niəu',n1+' 处'],['读 iou~iəu',n0+' 处'],
+        ['零声母区占比',(n0/cfg.points.length*100).toFixed(1)+'%']];
+    }else if(cfg.id==='p3'){
+      cards=[['定点记录',cfg.points.length+' 条'],['涉及字',Object.keys(cfg.groups).length+' 个'],
+        ['覆盖县市',new Set(cfg.points.map(p=>p[0])).size+' 处'],['无定点字','孽 · 蔫']];
+    }else{
+      const c={};
+      cfg.points.forEach(p=>{const g=groupOf(p[3],cfg.groups);c[g]=(c[g]||0)+1;});
+      const top=Object.keys(c).sort((a,b)=>c[b]-c[a])[0];
+      cards=[['定点',cfg.points.length+' 处'],['类别',Object.keys(cfg.groups).length+' 类'],
+        ['最密一类',`${cfg.groups[top].name} · ${c[top]} 点`]];
+    }
+    statsEl.innerHTML=cards.map(([t,v])=>`<div class="stat"><b>${v}</b><span>${t}</span></div>`).join('');
+  }
+
+  (function enablePanZoom(){
+    let dragging=false,sx=0,sy=0,vb0=null;
+    wrap.addEventListener('wheel',e=>{
+      e.preventDefault(); if(!curVB)return;
+      const rect=wrap.getBoundingClientRect(); if(rect.width===0)return;
+      const mx=(e.clientX-rect.left)/rect.width, my=(e.clientY-rect.top)/rect.height;
+      const k=e.deltaY>0?1.18:0.85;
+      const vb=curVB.slice();
+      const nw=Math.min(8000,Math.max(20,vb[2]*k)), nh=vb[3]*(nw/vb[2]);
+      vb[0]+=(vb[2]-nw)*mx; vb[1]+=(vb[3]-nh)*my; vb[2]=nw; vb[3]=nh;
+      setView(vb);
+    },{passive:false});
+    wrap.addEventListener('pointerdown',e=>{
+      if(e.target.closest('.bub'))return; if(!curVB)return;
+      dragging=true;sx=e.clientX;sy=e.clientY;vb0=curVB.slice();
+      try{wrap.setPointerCapture(e.pointerId);}catch(_){}
+    });
+    wrap.addEventListener('pointermove',e=>{
+      if(!dragging||!vb0)return;
+      const rect=wrap.getBoundingClientRect(); if(rect.width===0)return;
+      const vb=vb0.slice();
+      vb[0]=vb0[0]-(e.clientX-sx)*(vb0[2]/rect.width);
+      vb[1]=vb0[1]-(e.clientY-sy)*(vb0[3]/rect.height);
+      setView(vb);
+    });
+    wrap.addEventListener('pointerup',e=>{dragging=false;vb0=null;try{wrap.releasePointerCapture(e.pointerId);}catch(_){}});
+  })();
+
+  /* 启动顺序：先主体，再府辖，再泛称（不互相清空） */
+  buildMarkups();
+  buildBubbles();
+  buildFuxian();
+  buildZones();
+  buildStats();
+  buildRank();
+  buildNoplace();
+  setView(vbOf(cfg.views[cfg.defaultView]));
+  applyFilter();
+}
+
+/* ========== 7. 标签页（try/catch 隔离，某页出错不影响其他页） ========== */
+const tabsEl=document.getElementById('tabs');
+const pagesEl=document.getElementById('pages');
+PAGES.forEach((cfg,i)=>{
+  const btn=document.createElement('button');
+  btn.textContent=cfg.tab;
+  if(i===0)btn.classList.add('on');
+  btn.addEventListener('click',()=>{
+    [...tabsEl.children].forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    [...pagesEl.children].forEach(p=>p.classList.remove('on'));
+    document.getElementById(cfg.id).classList.add('on');
+  });
+  tabsEl.appendChild(btn);
+
+  const sec=document.createElement('section');
+  sec.className='page'+(i===0?' on':'');
+  sec.id=cfg.id;
+  pagesEl.appendChild(sec);
+
+  try{ createApp(sec,cfg); }
+  catch(e){
+    console.error('[render]',cfg.id,e);
+    sec.innerHTML+=`<div style="color:#f472b6;padding:20px;font-size:13px">页面 ${cfg.id} 渲染出错：${e.message}</div>`;
+  }
+});
+</script>
+</body>
+</html>
